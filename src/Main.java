@@ -1,3 +1,8 @@
+/**
+ * Andrey Smirnov (mail@ansmirnov.ru)
+ */
+
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 

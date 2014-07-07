@@ -1,3 +1,8 @@
+/**
+ * Andrey Smirnov (mail@ansmirnov.ru)
+ */
+
+
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

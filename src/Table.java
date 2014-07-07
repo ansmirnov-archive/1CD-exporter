@@ -1,3 +1,8 @@
+/**
+ * Andrey Smirnov (mail@ansmirnov.ru)
+ */
+
+
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -20,8 +25,7 @@ public class Table {
             int addr = this.head.getInt(24 + i * 4);
             if (addr == 0) {
                 this.objects[i] = null;
-            }
-            else {
+            } else {
                 this.objects[i] = new Object(this, addr);
             }
         }
@@ -30,4 +34,5 @@ public class Table {
     public Object[] getObjects() {
         return this.objects;
     }
+
 }
