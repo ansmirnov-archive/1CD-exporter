@@ -29,7 +29,7 @@ public class Base1CD {
         return b;
     }
 
-    public ByteBuffer readBlock(int i)
+    public ByteBuffer readBlock(long i)
             throws IOException{
         return this.readBuffer((long)i * BLOCK_SIZE, BLOCK_SIZE);
     }
