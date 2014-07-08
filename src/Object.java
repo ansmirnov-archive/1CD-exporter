@@ -13,12 +13,12 @@ public class Object {
 
     public Base1CD base1cd;
     private Table parent_table;
-    private int start_block;
+    private long start_block;
     private ByteBuffer head;
     private int n_blocks;
     private int[] blocks;
 
-    public Object(Table parent_table, int start_block)
+    public Object(Table parent_table, long start_block)
             throws IOException {
         this.base1cd = parent_table.base1cd;
         this.parent_table = parent_table;
@@ -43,7 +43,6 @@ public class Object {
     public String asString()
             throws IOException {
         String res = new String("");
-        System.out.printf("!%d \n", this.n_blocks);
         for (int i = 0; i < this.n_blocks; i++) {
             res += this.blockAsString(i);
         }
