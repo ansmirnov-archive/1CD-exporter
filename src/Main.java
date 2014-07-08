@@ -5,21 +5,16 @@
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.Map;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
         Base1CD base1cd = new Base1CD("/home/ateladmin/1Cv8.1CD");
         Table tables[] = base1cd.readTableList();
-        String str = tables[0].getObjects()[0].asString();
-        for (int i = 0; i < tables.length; i++) {
-            System.out.printf("%d:\n", i);
-            Object[] objects = tables[i].getObjects();
-            for (int j = 0; j < objects.length; j++) {
-                if (objects[j] != null) {
-                    objects[j].asString();
-                }
-            }
-        }
+//        System.out.print(tables[0].getDescribe());
+        List<TableItem> test = tables[0].getTableItems();
+        //System.out.print((new TableInfo(tables[0].getTableInfo().getValue("Fields"))).getValue("FILENAME"));
     }
 }

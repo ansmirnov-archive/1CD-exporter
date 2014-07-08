@@ -5,11 +5,16 @@
 import java.util.*;
 
 public class TableInfo {
-    private int ITER;
+    private Character[] arr_delimiters = {'{', '}', ','}, arr_ignored = {'\n', ' ', '"'};
+    private HashSet<Character> delimiters = new HashSet<Character>(Arrays.asList(arr_delimiters));
+    private HashSet<Character> ignored = new HashSet<Character>(Arrays.asList(arr_ignored));
+    private int Iter;
     private String StrInfo;
+    private List<TableItem> Items;
 
     public TableInfo(String StrInfo) {
         this.StrInfo = StrInfo;
+        genItems();
     }
 
     public TableInfo(List<String> StrInfoList) {
@@ -17,24 +22,27 @@ public class TableInfo {
         for (int i = 0; i < StrInfoList.size(); i++) {
             this.StrInfo += StrInfoList.get(i);
         }
+        genItems();
     }
 
     public char getChar() {
-        return this.StrInfo.charAt(this.ITER);
+        if (!canRead()) return 0;
+        return this.StrInfo.charAt(this.Iter);
     }
 
     public void nextChar() {
-        this.ITER++;
+        this.Iter++;
     }
 
     public void clearIter() {
-        this.ITER = 0;
+        this.Iter = 0;
+    }
+
+    public boolean canRead() {
+        return (this.Iter < this.StrInfo.length());
     }
 
     public String getLiter() {
-        Character[] arr_delimiters = {'{', '}', ','}, arr_ignored = {'\n', ' ', '"'};
-        HashSet<Character> delimiters = new HashSet<Character>(Arrays.asList(arr_delimiters));
-        HashSet<Character> ignored = new HashSet<Character>(Arrays.asList(arr_ignored));
         String s = new String();
         char c;
         do {
@@ -58,39 +66,48 @@ public class TableInfo {
         } while (true);
     }
 
-    public List<String> getValue(String index) {
+    private void genItems() {
+        this.Items = new ArrayList<TableItem>();
         this.clearIter();
-        String s = getLiter();
-        List<String> res = new ArrayList<String>();
-        if (!s.equals("{"))
-            return null;
-        while (s != null) {
-            if (!s.equals("{")) {
-                s = this.getLiter();
-                continue;
+        //this.getLiter();
+        int r = 0;
+        String s = getLiter(), sub = new String();
+        while (true) {
+            s = getLiter();
+            if (s == null) return;
+            if (r == 0) {
+                if (!delimiters.contains(s.charAt(0)))
+                    this.Items.add(new TableItem(s));
             }
-            s = this.getLiter();
-            if (!s.equals(index)) {
-                s = this.getLiter();
-                continue;
+            else {
+                sub += s;
             }
-            s = this.getLiter();
-            int r = 0;
-            while (true) {
-                s = this.getLiter();
-                if (s.equals("{")) {
-                    r++;
+            if (s.equals("{")) {
+                if (r == 0) {
+                    sub += s;
                 }
-                if (s.equals("}")) {
-                    r--;
-                    if (r < 0) {
-                        break;
-                    }
-                }
-                res.add(s);
+                r++;
             }
-            return res;
+            if (s.equals("}")) {
+                r--;
+                if (r == 0) {
+                    this.Items.add(new TableItem(new TableInfo(sub)));
+                    sub = new String();
+                }
+            }
         }
-        return null;
+    }
+
+    public List<String> cleanValue(List<String> value) {
+        List<String> res = new ArrayList<String>();
+        for (int i = 0; i < value.size(); i++) {
+            if (!value.get(i).equals(","))
+                res.add(value.get(i));
+        }
+        return res;
+    }
+
+    public List<TableItem> getItems() {
+        return this.Items;
     }
 }

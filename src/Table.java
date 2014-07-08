@@ -7,6 +7,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.util.List;
 
 public class Table {
 
@@ -57,6 +58,11 @@ public class Table {
     public TableInfo getTableInfo()
             throws IOException {
         return new TableInfo(this.getHandle());
+    }
+
+    public List<TableItem> getTableItems()
+            throws IOException{
+        return this.getTableInfo().getItems();
     }
 
 }
