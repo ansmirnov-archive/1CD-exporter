@@ -26,6 +26,7 @@ public class Base1CD {
             throws IOException {
         ByteBuffer b = ByteBuffer.allocate(size).order(ByteOrder.LITTLE_ENDIAN);
         this.inChannel.read(b, offset);
+        b.position(0);
         return b;
     }
 
