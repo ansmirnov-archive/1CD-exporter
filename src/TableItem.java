@@ -15,4 +15,12 @@ public class TableItem {
         this.type = 2;
         this.child = child;
     }
+
+    public TableInfo getChild() {
+        return child;
+    }
+
+    public String getValue() {
+        return value;
+    }
 }
