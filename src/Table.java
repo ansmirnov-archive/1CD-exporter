@@ -25,18 +25,34 @@ public class Table {
         this.TableItems = this.getTableInfo().getItems();
     }
 
-    public Object[] getObjects()
+    public List<Object> getObjects(ByteBuffer block)
             throws IOException {
-        Object objects[] = new Object[1018];
+        List<Object> objects = new ArrayList<Object>();
         for (int i = 0; i < 1018; i++) {
-            int addr = this.head.getInt(24 + i * 4);
-            if (addr == 0) {
-                objects[i] = null;
-            } else {
-                objects[i] = new Object(this, addr);
+            long addr = block.getInt(24 + i * 4);
+            if (addr != 0) {
+                objects.add(new Object(this, addr));
             }
         }
         return objects;
+    }
+
+    public List<Object> getHeadObjects()
+            throws IOException {
+        return this.getObjects(this.head);
+    }
+
+    public List<Object> getDataObjects()
+            throws IOException {
+        ByteBuffer data = base1cd.readBlock(this.getFiles()[0]);
+        return this.getObjects(data);
+    }
+
+    public ByteBuffer getData()
+            throws IOException {
+        List<Object> objects = this.getDataObjects();
+        if (objects.size() > 1) return null;
+        return objects.get(0).asByteBuffer();
     }
 
     public Object getObject(int i)
@@ -59,6 +75,15 @@ public class Table {
         List<Field> res = new ArrayList<Field>();
         for (int i = 1; i < fields.size(); i++) {
             res.add(new Field(this, fields.get(i).getChild().getItems()));
+        }
+        return res;
+    }
+
+    public int[] getFiles() {
+        int[] res = new int[3];
+        List<TableItem> items = this.TableItems.get(5).getChild().getItems();
+        for (int i = 0; i < 3; i++) {
+            res[i] = Integer.parseInt(items.get(i + 1).getValue());
         }
         return res;
     }

@@ -48,4 +48,14 @@ public class Object {
         }
         return res;
     }
+
+    public ByteBuffer asByteBuffer()
+            throws IOException {
+        ByteBuffer res = ByteBuffer.allocate(this.n_blocks*4096).order(ByteOrder.LITTLE_ENDIAN);
+        res.position(0);
+        for (int i = 0; i < this.n_blocks; i++) {
+            res.put(this.base1cd.readBlock(this.blocks[i]));
+        }
+        return res;
+    }
 }
