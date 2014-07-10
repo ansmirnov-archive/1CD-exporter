@@ -37,4 +37,25 @@ public class Field {
         this.FieldCaseSensitive = tableItems.get(5).getValue();
     }
 
+    public int size() {
+        if (this.FieldType == "B")
+            return Integer.parseInt(this.FieldLength);
+        if (this.FieldType == "L")
+            return 1;
+        if (this.FieldType == "N")
+            return (int)((Integer.parseInt(this.FieldLength) + 2.0) / 2);
+        if (this.FieldType == "NC")
+            return Integer.parseInt(this.FieldLength) * 2;
+        if (this.FieldType == "NVC")
+            return Integer.parseInt(this.FieldLength) * 2 + 2;
+        if (this.FieldType == "RV")
+            return 16;
+        if (this.FieldType == "NT")
+            return 8;
+        if (this.FieldType == "I")
+            return 8;
+        if (this.FieldType == "DT")
+            return 7;
+        return Integer.parseInt(this.FieldLength);
+    }
 }
