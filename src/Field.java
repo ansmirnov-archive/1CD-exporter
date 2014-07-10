@@ -3,6 +3,7 @@
  */
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 public class Field {
@@ -14,6 +15,7 @@ public class Field {
     public String FieldLength;
     public String FieldPrecision;
     public String FieldCaseSensitive;
+    public ByteBuffer Value;
 
     public Field(Table parent_table, String FieldName, String FieldType, String NullExists, String FieldLength, String FieldPrecision, String FieldCaseSensitive)
             throws IOException {
@@ -38,24 +40,35 @@ public class Field {
     }
 
     public int size() {
-        if (this.FieldType == "B")
+        if (this.FieldType.equals("B"))
             return Integer.parseInt(this.FieldLength);
-        if (this.FieldType == "L")
+        if (this.FieldType.equals("L"))
             return 1;
-        if (this.FieldType == "N")
+        if (this.FieldType.equals("N"))
             return (int)((Integer.parseInt(this.FieldLength) + 2.0) / 2);
-        if (this.FieldType == "NC")
+        if (this.FieldType.equals("NC"))
             return Integer.parseInt(this.FieldLength) * 2;
-        if (this.FieldType == "NVC")
+        if (this.FieldType.equals("NVC"))
             return Integer.parseInt(this.FieldLength) * 2 + 2;
-        if (this.FieldType == "RV")
+        if (this.FieldType.equals("RV"))
             return 16;
-        if (this.FieldType == "NT")
+        if (this.FieldType.equals("NT"))
             return 8;
-        if (this.FieldType == "I")
+        if (this.FieldType.equals("I"))
             return 8;
-        if (this.FieldType == "DT")
+        if (this.FieldType.equals("DT"))
             return 7;
+        if (this.FieldType.equals("FAKE_VERSION"))
+            return 16;
+        if (this.FieldType.equals("MARK"))
+            return 16;
         return Integer.parseInt(this.FieldLength);
+    }
+
+    public void readValue(ByteBuffer data, int offset) {
+        int size = this.size();
+        byte[] res = new byte[size];
+        data.get(res, offset, size);
+        this.Value = ByteBuffer.allocate(size).put(res);
     }
 }

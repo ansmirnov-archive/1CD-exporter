@@ -9,6 +9,7 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Table {
 
@@ -16,6 +17,9 @@ public class Table {
     private int start_block;
     private ByteBuffer head;
     private List<TableItem> TableItems;
+    private int ValuesPosition;
+    private ByteBuffer Data;
+    private List<Field> Fields;
 
     public Table(Base1CD base1cd, int start_block)
             throws IOException {
@@ -23,6 +27,8 @@ public class Table {
         this.start_block = start_block;
         this.head = base1cd.readBlock(start_block);
         this.TableItems = this.getTableInfo().getItems();
+        this.Data = null;
+        this.Fields = null;
     }
 
     public List<Object> getObjects(ByteBuffer block)
@@ -50,9 +56,12 @@ public class Table {
 
     public ByteBuffer getData()
             throws IOException {
+        if (this.Data != null)
+            return this.Data;
         List<Object> objects = this.getDataObjects();
         if (objects.size() > 1) return null;
-        return objects.get(0).asByteBuffer();
+        this.Data = objects.get(0).asByteBuffer();
+        return this.Data;
     }
 
     public Object getObject(int i)
@@ -71,11 +80,21 @@ public class Table {
 
     public List<Field> getFields()
             throws IOException {
+        if (this.Fields != null)
+            return this.Fields;
         List<TableItem> fields = this.TableItems.get(2).getChild().getItems();
         List<Field> res = new ArrayList<Field>();
         for (int i = 1; i < fields.size(); i++) {
-            res.add(new Field(this, fields.get(i).getChild().getItems()));
+            Field field = new Field(this, fields.get(i).getChild().getItems());
+            if (field.FieldType.equals("RV"))
+                res.add(0, field);
+            else
+                res.add(field);
         }
+        if (!res.get(0).FieldType.equals("RV"))
+            res.add(0, new Field(this, "FAKE_VERSION", "FAKE_VERSION", "", "16", "", ""));
+        res.add(0, new Field(this, "MARK", "MARK", "", "1", "", ""));
+        this.Fields = res;
         return res;
     }
 
@@ -96,6 +115,31 @@ public class Table {
     public List<TableItem> getTableItems()
             throws IOException{
         return this.TableItems;
+    }
+
+    public int recordSize()
+            throws IOException{
+        this.getFields();
+        int res = 0;
+        for (int i = 0; i < this.Fields.size(); i++) {
+            res += this.Fields.get(i).size();
+        }
+        return res;
+    }
+
+    public List<Field> readValues(int number)
+            throws IOException {
+        this.getData();
+        this.getFields();
+        int record_size = this.recordSize();
+        int start_record = number * record_size + 1;
+        int offset = 0;
+        for (int i = 0; i < this.Fields.size(); i++) {
+            Field field = this.Fields.get(i);
+            field.readValue(this.Data, start_record + offset);
+            offset += field.size();
+        }
+        return this.Fields;
     }
 
 }
